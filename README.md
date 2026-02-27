@@ -1,1 +1,821 @@
-# BAG
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Recharge Express</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #F5A623;
+      --gold-light: #FFD166;
+      --gold-dark: #C47D0E;
+      --black: #0C0C0C;
+      --dark: #141414;
+      --dark2: #1E1E1E;
+      --dark3: #2A2A2A;
+      --white: #FFFFFF;
+      --gray: #888888;
+      --gray-light: #BBBBBB;
+      --danger: #FF4D4D;
+      --success: #4DFF91;
+      --radius: 16px;
+      --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: var(--black);
+      color: var(--white);
+      overflow: hidden;
+    }
+
+    .app {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      max-width: 480px; margin: 0 auto;
+      position: relative; overflow: hidden;
+    }
+
+    .screen {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transform: translateX(60px);
+      transition: opacity var(--transition), transform var(--transition);
+      overflow-y: auto;
+    }
+    .screen.active {
+      opacity: 1; pointer-events: all;
+      transform: translateX(0);
+    }
+    .screen.exit {
+      opacity: 0; pointer-events: none;
+      transform: translateX(-60px);
+    }
+
+    .header {
+      padding: 48px 28px 20px;
+      display: flex; flex-direction: column; align-items: center;
+      background: linear-gradient(180deg, rgba(245,166,35,0.08) 0%, transparent 100%);
+      text-align: center; flex-shrink: 0;
+    }
+    .lion-logo {
+      width: 76px; height: 76px;
+      background: var(--dark2);
+      border: 2px solid var(--gold-dark);
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+      font-size: 2.6rem;
+      position: relative; overflow: hidden;
+    }
+    .lion-logo::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 30%, rgba(245,166,35,0.2), transparent 70%);
+      pointer-events: none;
+    }
+    .brand-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; letter-spacing: 0.1em;
+      color: var(--white); line-height: 1;
+    }
+    .brand-name span { color: var(--gold); }
+    .brand-sub {
+      font-size: 0.7rem; font-weight: 500;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--gray); margin-top: 3px;
+    }
+
+    .progress-bar {
+      padding: 16px 28px 0;
+      display: flex; gap: 6px; flex-shrink: 0;
+    }
+    .progress-step {
+      flex: 1; height: 3px; border-radius: 100px;
+      background: var(--dark3); transition: background 0.4s;
+    }
+    .progress-step.done { background: var(--gold-dark); }
+    .progress-step.active { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+
+    .content {
+      flex: 1; padding: 20px 28px 32px;
+      display: flex; flex-direction: column;
+    }
+    .screen-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; letter-spacing: 0.04em;
+      line-height: 1.05; margin-bottom: 6px;
+    }
+    .screen-sub {
+      font-size: 0.88rem; color: var(--gray-light);
+      line-height: 1.6; margin-bottom: 22px;
+    }
+
+    .deposit-banner {
+      background: linear-gradient(135deg, rgba(245,166,35,0.16), rgba(196,125,14,0.07));
+      border: 1px solid rgba(245,166,35,0.45);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      margin-bottom: 16px;
+      display: flex; gap: 12px; align-items: center;
+    }
+    .deposit-icon { font-size: 1.8rem; flex-shrink: 0; }
+    .deposit-text h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.15rem; letter-spacing: 0.06em;
+      color: var(--gold); margin-bottom: 2px;
+    }
+    .deposit-text p { font-size: 0.8rem; color: var(--gray-light); line-height: 1.5; }
+
+    .cond-card {
+      background: var(--dark2);
+      border: 1px solid rgba(245,166,35,0.1);
+      border-radius: var(--radius);
+      overflow: hidden; margin-bottom: 16px;
+    }
+    .condition-item {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .condition-item:last-child { border-bottom: none; }
+    .cond-icon {
+      width: 38px; height: 38px; flex-shrink: 0;
+      background: rgba(245,166,35,0.1);
+      border: 1px solid rgba(245,166,35,0.2);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .cond-text h4 { font-size: 0.88rem; font-weight: 600; margin-bottom: 3px; }
+    .cond-text p { font-size: 0.8rem; color: var(--gray-light); line-height: 1.5; }
+    .cond-text strong { color: var(--gold-light); }
+
+    .checkbox-row {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 14px 0; margin-bottom: 6px;
+    }
+    .checkbox-row input[type=checkbox] {
+      width: 20px; height: 20px; flex-shrink: 0;
+      accent-color: var(--gold); cursor: pointer; margin-top: 2px;
+    }
+    .checkbox-row label {
+      font-size: 0.83rem; color: var(--gray-light);
+      line-height: 1.55; cursor: pointer;
+    }
+    .checkbox-row label strong { color: var(--white); }
+
+    .pricing-grid { display: flex; flex-direction: column; gap: 9px; margin-bottom: 16px; }
+    .pricing-option {
+      background: var(--dark2);
+      border: 1.5px solid rgba(255,255,255,0.07);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .pricing-option:hover { border-color: rgba(245,166,35,0.35); }
+    .pricing-option.selected {
+      border-color: var(--gold);
+      background: linear-gradient(135deg, rgba(245,166,35,0.1), rgba(196,125,14,0.04));
+    }
+    .pricing-option.selected::before {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 3px; height: 100%; background: var(--gold);
+    }
+    .pricing-option input[type=radio] { display: none; }
+    .po-left h4 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.25rem; letter-spacing: 0.04em; margin-bottom: 1px;
+    }
+    .po-left p { font-size: 0.76rem; color: var(--gray); }
+    .po-badge {
+      display: inline-block;
+      background: rgba(245,166,35,0.18);
+      border: 1px solid rgba(245,166,35,0.4);
+      color: var(--gold); font-size: 0.66rem;
+      font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 7px; border-radius: 100px; margin-top: 3px;
+    }
+    .po-right { text-align: right; }
+    .po-right .price {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.7rem; letter-spacing: 0.02em;
+      color: var(--gold); line-height: 1;
+    }
+    .po-right .currency { font-size: 0.75rem; color: var(--gray); margin-top: 1px; }
+    .po-check {
+      width: 20px; height: 20px;
+      border: 1.5px solid var(--dark3); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; margin-left: 10px; flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .pricing-option.selected .po-check {
+      background: var(--gold); border-color: var(--gold);
+      color: var(--black); font-weight: 800;
+    }
+
+    .info-box {
+      background: var(--dark2);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px; padding: 12px 14px;
+      font-size: 0.8rem; color: var(--gray-light);
+      line-height: 1.6; margin-bottom: 16px;
+    }
+    .info-box strong { color: var(--gold-light); }
+
+    .order-summary {
+      background: var(--dark2);
+      border: 1px solid rgba(245,166,35,0.18);
+      border-radius: var(--radius); padding: 16px; margin-bottom: 18px;
+    }
+    .order-row {
+      display: flex; justify-content: space-between;
+      font-size: 0.86rem; color: var(--gray-light); padding: 5px 0;
+    }
+    .order-row.total {
+      border-top: 1px solid rgba(255,255,255,0.07);
+      margin-top: 6px; padding-top: 10px;
+      font-weight: 700; color: var(--white); font-size: 0.95rem;
+    }
+    .order-row.total .amount { color: var(--gold); }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block; font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--gray); margin-bottom: 7px;
+    }
+    .form-group input {
+      width: 100%; background: var(--dark2);
+      border: 1.5px solid rgba(255,255,255,0.09);
+      border-radius: 12px; padding: 13px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.93rem; color: var(--white);
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+    }
+    .form-group input::placeholder { color: rgba(255,255,255,0.18); }
+    .form-group input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(245,166,35,0.12);
+    }
+    .form-group input.error { border-color: var(--danger); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .input-error { font-size: 0.73rem; color: var(--danger); margin-top: 4px; display: none; }
+    .input-error.show { display: block; }
+
+    .card-icons { display: flex; gap: 5px; margin-bottom: 8px; }
+    .card-icon {
+      background: var(--dark3); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 5px; padding: 3px 8px;
+      font-size: 0.65rem; font-weight: 700; color: var(--gray-light);
+    }
+    .secure-note {
+      display: flex; gap: 8px; align-items: center;
+      background: rgba(77,255,145,0.05);
+      border: 1px solid rgba(77,255,145,0.15);
+      border-radius: 10px; padding: 10px 13px;
+      font-size: 0.77rem; color: rgba(77,255,145,0.85);
+      margin-bottom: 18px;
+    }
+
+    .btn {
+      width: 100%; padding: 16px;
+      border: none; border-radius: 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.97rem; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+      color: var(--black);
+      box-shadow: 0 6px 20px rgba(245,166,35,0.3);
+    }
+    .btn-gold:hover { box-shadow: 0 10px 28px rgba(245,166,35,0.45); transform: translateY(-1px); }
+    .btn-gold:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.13);
+      color: var(--gray-light);
+    }
+    .btn-back {
+      background: transparent; border: none;
+      color: var(--gray); font-size: 0.83rem;
+      cursor: pointer; padding: 0 0 16px;
+      display: flex; align-items: center; gap: 5px;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-back:hover { color: var(--white); }
+
+    /* SUCCESS */
+    .success-screen {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 100%; padding: 40px 28px; text-align: center;
+    }
+    .success-icon {
+      width: 90px; height: 90px;
+      background: linear-gradient(135deg, rgba(245,166,35,0.18), rgba(196,125,14,0.08));
+      border: 2px solid var(--gold); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; margin-bottom: 24px;
+      animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes pop { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    .success-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem; letter-spacing: 0.06em; margin-bottom: 8px;
+    }
+    .success-sub {
+      font-size: 0.9rem; color: var(--gray-light);
+      line-height: 1.65; margin-bottom: 28px; max-width: 280px;
+    }
+    .rental-id {
+      background: var(--dark2);
+      border: 1px solid rgba(245,166,35,0.3);
+      border-radius: 12px; padding: 14px 24px; margin-bottom: 24px;
+    }
+    .rental-id p { font-size: 0.7rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; }
+    .rental-id h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.7rem; color: var(--gold); letter-spacing: 0.12em; }
+    .unlock-bar {
+      width: 180px; height: 5px;
+      background: var(--dark3); border-radius: 100px; overflow: hidden; margin-bottom: 8px;
+    }
+    .unlock-fill {
+      height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      border-radius: 100px;
+      animation: fillBar 2.2s ease-out forwards;
+    }
+    @keyframes fillBar { 0% { width: 0%; } 100% { width: 100%; } }
+    .unlock-text { font-size: 0.8rem; color: var(--gray); margin-bottom: 24px; }
+
+    /* LOADING */
+    .loading-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(12,12,12,0.88);
+      backdrop-filter: blur(8px);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .loading-overlay.show { opacity: 1; pointer-events: all; }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 3px solid rgba(245,166,35,0.18);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin-bottom: 18px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 0.9rem; color: var(--gray-light); }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--danger); color: var(--white);
+      border-radius: 100px; padding: 11px 22px;
+      font-size: 0.85rem; font-weight: 600;
+      z-index: 2000; transition: transform 0.3s; white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success-toast { background: var(--success); color: var(--black); }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-thumb { background: var(--dark3); border-radius: 4px; }
+
+    @media (min-width: 481px) {
+      body {
+        display: flex; align-items: center; justify-content: center;
+        background: #070707;
+      }
+      .app {
+        height: calc(100vh - 40px); max-height: 860px;
+        border-radius: 36px;
+        border: 1px solid rgba(245,166,35,0.12);
+        overflow: hidden;
+        box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 80px rgba(245,166,35,0.04);
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ══ SCREEN 1: CONDITIONS ══ -->
+  <div class="screen active" id="screen-1">
+    <div class="header">
+      <div class="lion-logo">🦁</div>
+      <div class="brand-name">RECHARGE <span>EXPRESS</span></div>
+      <div class="brand-sub">Location de Powerbank</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-step active"></div>
+      <div class="progress-step"></div>
+      <div class="progress-step"></div>
+    </div>
+    <div class="content">
+      <div class="screen-title">Conditions<br>de location</div>
+      <div class="screen-sub">Lisez attentivement avant de continuer.</div>
+
+      <div class="deposit-banner">
+        <div class="deposit-icon">🔒</div>
+        <div class="deposit-text">
+          <h3>Dépôt de garantie</h3>
+          <p>Un débit pré-autorisé sera effectué sur votre compte. Il sera <strong>intégralement restitué</strong> après retour du powerbank.</p>
+        </div>
+      </div>
+
+      <div class="cond-card">
+        <div class="condition-item">
+          <div class="cond-icon">⚡</div>
+          <div class="cond-text">
+            <h4>Powerbank LitaPower 5 000 mAh</h4>
+            <p>Compatible <strong>iPhone, Android & USB-C</strong>. Recharge rapide. Prêt à l'emploi dès la sortie de la borne.</p>
+          </div>
+        </div>
+        <div class="condition-item">
+          <div class="cond-icon">↩️</div>
+          <div class="cond-text">
+            <h4>Retour obligatoire</h4>
+            <p>Le powerbank doit être retourné dans <strong>n'importe quelle borne Recharge Express</strong>. Sans retour, le dépôt <strong>ne sera pas remboursé</strong>.</p>
+          </div>
+        </div>
+        <div class="condition-item">
+          <div class="cond-icon">🤝</div>
+          <div class="cond-text">
+            <h4>Respect du matériel</h4>
+            <p>D'autres utilisateurs utiliseront cet appareil après vous. Merci de le traiter avec soin. <strong>Tout dommage volontaire sera facturé.</strong></p>
+          </div>
+        </div>
+        <div class="condition-item">
+          <div class="cond-icon">⏰</div>
+          <div class="cond-text">
+            <h4>Non-retour après 24h</h4>
+            <p>Si le powerbank n'est pas retourné dans les <strong>24 heures</strong>, le dépôt sera définitivement conservé et des frais supplémentaires pourront s'appliquer.</p>
+          </div>
+        </div>
+        <div class="condition-item">
+          <div class="cond-icon">💳</div>
+          <div class="cond-text">
+            <h4>Paiement sécurisé</h4>
+            <p>Vos informations bancaires sont <strong>chiffrées et protégées</strong>. Le montant est débité selon la durée choisie.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="agree" onchange="toggleNextBtn()"/>
+        <label for="agree">J'ai lu et j'accepte les <strong>conditions de location</strong> et la politique de dépôt de garantie de Recharge Express.</label>
+      </div>
+
+      <button class="btn btn-gold" id="btn-next-1" disabled onclick="goTo(2)">
+        Continuer →
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 2: TARIFS ══ -->
+  <div class="screen" id="screen-2">
+    <div class="header">
+      <div class="lion-logo">🦁</div>
+      <div class="brand-name">RECHARGE <span>EXPRESS</span></div>
+      <div class="brand-sub">Location de Powerbank</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-step done"></div>
+      <div class="progress-step active"></div>
+      <div class="progress-step"></div>
+    </div>
+    <div class="content">
+      <button class="btn-back" onclick="goTo(1)">← Retour</button>
+      <div class="screen-title">Choisissez<br>votre durée</div>
+      <div class="screen-sub">Tarif : <strong style="color:var(--gold)">1 500 FCFA / 30 min</strong>. Toute tranche entamée est facturée.</div>
+
+      <div class="pricing-grid">
+        <label class="pricing-option selected" onclick="selectPricing(this, '30min', 1500, '30 minutes')">
+          <input type="radio" name="dur" checked/>
+          <div class="po-left">
+            <h4>30 minutes</h4>
+            <p>Recharge rapide</p>
+          </div>
+          <div class="po-right"><div class="price">1 500</div><div class="currency">FCFA</div></div>
+          <div class="po-check">✓</div>
+        </label>
+
+        <label class="pricing-option" onclick="selectPricing(this, '1h', 3000, '1 heure')">
+          <input type="radio" name="dur"/>
+          <div class="po-left">
+            <h4>1 heure</h4>
+            <p>Pour une soirée tranquille</p>
+            <span class="po-badge">⭐ Populaire</span>
+          </div>
+          <div class="po-right"><div class="price">3 000</div><div class="currency">FCFA</div></div>
+          <div class="po-check">✓</div>
+        </label>
+
+        <label class="pricing-option" onclick="selectPricing(this, '1h30', 4500, '1h 30 minutes')">
+          <input type="radio" name="dur"/>
+          <div class="po-left">
+            <h4>1h 30 minutes</h4>
+            <p>Longue durée</p>
+          </div>
+          <div class="po-right"><div class="price">4 500</div><div class="currency">FCFA</div></div>
+          <div class="po-check">✓</div>
+        </label>
+
+        <label class="pricing-option" onclick="selectPricing(this, '2h', 6000, '2 heures')">
+          <input type="radio" name="dur"/>
+          <div class="po-left">
+            <h4>2 heures</h4>
+            <p>Confort maximum</p>
+          </div>
+          <div class="po-right"><div class="price">6 000</div><div class="currency">FCFA</div></div>
+          <div class="po-check">✓</div>
+        </label>
+      </div>
+
+      <div class="info-box">
+        ℹ️ Le compteur démarre dès que le powerbank est extrait de la borne. <strong>Toute tranche de 30 min entamée est entièrement facturée.</strong>
+      </div>
+
+      <button class="btn btn-gold" onclick="goTo(3)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 3: PAIEMENT ══ -->
+  <div class="screen" id="screen-3">
+    <div class="header">
+      <div class="lion-logo">🦁</div>
+      <div class="brand-name">RECHARGE <span>EXPRESS</span></div>
+      <div class="brand-sub">Location de Powerbank</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-step done"></div>
+      <div class="progress-step done"></div>
+      <div class="progress-step active"></div>
+    </div>
+    <div class="content">
+      <button class="btn-back" onclick="goTo(2)">← Retour</button>
+      <div class="screen-title">Vos informations</div>
+      <div class="screen-sub">Renseignez vos coordonnées pour finaliser la location.</div>
+
+      <div class="order-summary">
+        <div class="order-row"><span>Durée choisie</span><span id="sum-duration">30 minutes</span></div>
+        <div class="order-row"><span>Tarif location</span><span id="sum-price">1 500 FCFA</span></div>
+        <div class="order-row"><span>Dépôt de garantie</span><span style="color:var(--gold-light)">Pré-autorisé</span></div>
+        <div class="order-row total"><span>Total à payer</span><span class="amount" id="sum-total">1 500 FCFA</span></div>
+      </div>
+
+      <div class="form-group">
+        <label>Nom complet</label>
+        <input type="text" id="f-name" placeholder="Ex: Abdou Diallo" autocomplete="name"/>
+        <div class="input-error" id="err-name">Veuillez entrer votre nom.</div>
+      </div>
+      <div class="form-group">
+        <label>Numéro de téléphone</label>
+        <input type="tel" id="f-phone" placeholder="+221 77 123 45 67" autocomplete="tel"/>
+        <div class="input-error" id="err-phone">Numéro invalide (min. 8 chiffres).</div>
+      </div>
+      <div class="form-group">
+        <label>Numéro de carte bancaire</label>
+        <div class="card-icons">
+          <span class="card-icon">VISA</span>
+          <span class="card-icon">MASTERCARD</span>
+          <span class="card-icon">AMEX</span>
+        </div>
+        <input type="text" id="f-card" placeholder="1234 5678 9012 3456"
+          maxlength="19" oninput="formatCard(this)" autocomplete="cc-number"/>
+        <div class="input-error" id="err-card">Numéro de carte invalide.</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Expiration</label>
+          <input type="text" id="f-expiry" placeholder="MM/AA"
+            maxlength="5" oninput="formatExpiry(this)" autocomplete="cc-exp"/>
+          <div class="input-error" id="err-expiry">Date invalide.</div>
+        </div>
+        <div class="form-group">
+          <label>CVV</label>
+          <input type="text" id="f-cvv" placeholder="123"
+            maxlength="4" oninput="this.value=this.value.replace(/\D/g,'')" autocomplete="cc-csc"/>
+          <div class="input-error" id="err-cvv">CVV invalide.</div>
+        </div>
+      </div>
+
+      <div class="secure-note">🔐 Paiement 100% sécurisé — données chiffrées et protégées</div>
+
+      <button class="btn btn-gold" id="btn-pay" onclick="handlePayment()">
+        ⚡ Confirmer &amp; déverrouiller
+      </button>
+      <p style="text-align:center;font-size:0.72rem;color:var(--gray);margin-top:10px;">
+        En continuant, vous acceptez les conditions de Recharge Express
+      </p>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 4: SUCCÈS ══ -->
+  <div class="screen" id="screen-4">
+    <div class="success-screen">
+      <div class="success-icon">⚡</div>
+      <div class="success-title">Powerbank déverrouillé !</div>
+      <p class="success-sub">Votre powerbank est prêt à être récupéré. Branchez votre téléphone et profitez !</p>
+
+      <div class="rental-id">
+        <p>Référence de location</p>
+        <h3 id="rental-id-display">RE-XXXXXX</h3>
+      </div>
+
+      <div class="unlock-bar"><div class="unlock-fill"></div></div>
+      <div class="unlock-text" id="unlock-status">Déverrouillage en cours…</div>
+
+      <div class="cond-card" style="width:100%;text-align:left;margin-bottom:20px;">
+        <div class="condition-item" style="padding:12px 14px">
+          <div class="cond-icon" style="font-size:1rem;width:34px;height:34px;">📌</div>
+          <div class="cond-text">
+            <h4>N'oubliez pas de retourner le powerbank</h4>
+            <p>Replacez-le dans une borne Recharge Express pour récupérer votre dépôt.</p>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-outline" style="max-width:280px" onclick="resetApp()">Nouvelle location</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">Traitement en cours…</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const state = { duration: '30min', durationLabel: '30 minutes', price: 1500, currentScreen: 1 };
+
+function goTo(n) {
+  const cur = document.getElementById(`screen-${state.currentScreen}`);
+  const next = document.getElementById(`screen-${n}`);
+  cur.classList.add('exit');
+  setTimeout(() => cur.classList.remove('active', 'exit'), 380);
+  next.classList.add('active');
+  state.currentScreen = n;
+  if (n === 3) {
+    document.getElementById('sum-duration').textContent = state.durationLabel;
+    document.getElementById('sum-price').textContent = state.price.toLocaleString('fr-FR') + ' FCFA';
+    document.getElementById('sum-total').textContent = state.price.toLocaleString('fr-FR') + ' FCFA';
+  }
+  next.scrollTop = 0;
+}
+
+function toggleNextBtn() {
+  document.getElementById('btn-next-1').disabled = !document.getElementById('agree').checked;
+}
+
+function selectPricing(el, dur, price, label) {
+  document.querySelectorAll('.pricing-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  Object.assign(state, { duration: dur, price, durationLabel: label });
+}
+
+function formatCard(input) {
+  let v = input.value.replace(/\D/g,'').substring(0,16);
+  input.value = v.match(/.{1,4}/g)?.join(' ') || v;
+}
+function formatExpiry(input) {
+  let v = input.value.replace(/\D/g,'').substring(0,4);
+  if (v.length >= 2) v = v.substring(0,2) + '/' + v.substring(2);
+  input.value = v;
+}
+
+function setError(id, show) {
+  document.getElementById(id).classList.toggle('show', show);
+  const inp = document.getElementById(id).previousElementSibling;
+  if (inp && inp.tagName === 'INPUT') inp.classList.toggle('error', show);
+}
+function validate() {
+  let ok = true;
+  const name = document.getElementById('f-name').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const card = document.getElementById('f-card').value.replace(/\s/g,'');
+  const expiry = document.getElementById('f-expiry').value;
+  const cvv = document.getElementById('f-cvv').value;
+
+  if (!name || name.length < 2) { setError('err-name', true); ok = false; } else setError('err-name', false);
+  if (!phone || phone.replace(/[\s+\-]/g,'').length < 8) { setError('err-phone', true); ok = false; } else setError('err-phone', false);
+  if (card.length < 15) { setError('err-card', true); ok = false; } else setError('err-card', false);
+  if (!/^\d{2}\/\d{2}$/.test(expiry)) { setError('err-expiry', true); ok = false; } else setError('err-expiry', false);
+  if (cvv.length < 3) { setError('err-cvv', true); ok = false; } else setError('err-cvv', false);
+  return ok;
+}
+
+async function handlePayment() {
+  if (!validate()) { showToast('Veuillez corriger les erreurs.'); return; }
+  document.getElementById('btn-pay').disabled = true;
+  showLoading('Traitement du paiement…');
+  try {
+    // ─────────────────────────────────────────────────────
+    // TODO: Remplacer par votre API bancaire locale
+    // Exemple de structure d'appel (à adapter à votre banque) :
+    //
+    // const paymentRes = await fetch('https://api.votre-banque.sn/v1/payments', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer YOUR_KEY' },
+    //   body: JSON.stringify({
+    //     amount: state.price,
+    //     currency: 'XOF',
+    //     card_number: document.getElementById('f-card').value.replace(/\s/g,''),
+    //     card_expiry: document.getElementById('f-expiry').value,
+    //     card_cvv: document.getElementById('f-cvv').value,
+    //     customer_name: document.getElementById('f-name').value,
+    //     customer_phone: document.getElementById('f-phone').value,
+    //     description: `Recharge Express - ${state.durationLabel}`,
+    //     preauth: true
+    //   })
+    // });
+    // const payment = await paymentRes.json();
+    // if (!payment.success) throw new Error(payment.message || 'Paiement refusé');
+    // ─────────────────────────────────────────────────────
+    await delay(2000); // Simulé — à supprimer avec la vraie API
+    const paymentRef = 'PAY-' + Math.random().toString(36).substring(2,10).toUpperCase();
+
+    updateLoading('Déverrouillage du powerbank…');
+
+    // ─────────────────────────────────────────────────────
+    // TODO: Remplacer par votre vraie clé LitaPower API
+    // await unlockLitaPower({ stationId: 'STATION_001', slotIndex: 1, paymentRef });
+    // ─────────────────────────────────────────────────────
+    await delay(1600); // Simulé — à supprimer
+    const rentalId = 'RE-' + Math.random().toString(36).substring(2,8).toUpperCase();
+
+    hideLoading();
+    document.getElementById('rental-id-display').textContent = rentalId;
+    setTimeout(() => {
+      document.getElementById('unlock-status').textContent = '✅ Powerbank déverrouillé — Borne n°1';
+    }, 2400);
+    goTo(4);
+  } catch(err) {
+    hideLoading();
+    document.getElementById('btn-pay').disabled = false;
+    showToast('Erreur de paiement. Vérifiez vos informations.');
+    console.error(err);
+  }
+}
+
+// LitaPower API — remplissez BASE_URL et API_KEY quand vous les avez
+async function unlockLitaPower({ stationId, slotIndex = 1, paymentRef }) {
+  const BASE_URL = 'https://api.litapower.com'; // ← à confirmer avec LitaPower
+  const API_KEY  = 'YOUR_LITAPOWER_API_KEY';    // ← votre clé API
+
+  const res = await fetch(`${BASE_URL}/v1/stations/${stationId}/unlock`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
+    body: JSON.stringify({ slot: slotIndex, duration: state.duration, payment_reference: paymentRef })
+  });
+  if (!res.ok) { const e = await res.json(); throw new Error(e.message || 'Erreur LitaPower'); }
+  return res.json();
+}
+
+function showLoading(t) { document.getElementById('loading-text').textContent = t; document.getElementById('loading').classList.add('show'); }
+function updateLoading(t) { document.getElementById('loading-text').textContent = t; }
+function hideLoading() { document.getElementById('loading').classList.remove('show'); }
+function showToast(msg, type='error') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type === 'success' ? ' success-toast' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+function resetApp() {
+  state.currentScreen = 1; state.price = 1500; state.duration = '30min'; state.durationLabel = '30 minutes';
+  document.getElementById('agree').checked = false;
+  document.getElementById('btn-next-1').disabled = true;
+  document.getElementById('btn-pay').disabled = false;
+  ['f-name','f-phone','f-card','f-expiry','f-cvv'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  document.querySelectorAll('.pricing-option').forEach((o,i) => o.classList.toggle('selected', i===0));
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active','exit'));
+  document.getElementById('screen-1').classList.add('active');
+}
+</script>
+</body>
+</html>
